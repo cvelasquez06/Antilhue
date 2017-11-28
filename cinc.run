@@ -1,0 +1,6 @@
+#!/bin/bash
+date=$(date +%d%m%Y)
+root=$(pwd);
+export $(sed -n '1,/system/d;/\[/,$d;/^$/d;p' $root"/"sys_options.conf)
+cd $dirInstall
+sh controller_incremental.sh >> "logs/"$date"_cincremental.log"
