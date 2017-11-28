@@ -1,0 +1,37 @@
+#!/bin/bash
+IFS=""
+if [ "$1" = "local" ]; then
+	shift
+	array=( "$@" )
+	for registers in ${array[*]}; do
+		name=$(echo $registers | awk -F"," '{print $1}' )
+		dirForBackup=$(echo $registers | awk -F"," '{print $2}' )
+		script=$(echo $registers | awk -F"," '{print $3}' )
+		maxSizeFiles=$(echo $registers | awk -F"," '{print $4}' )
+	 	excludeBackup=$(echo $registers | awk -F"," '{print $5}' )
+	 	echo $name","$dirForBackup","$script","$maxSizeFiles","$excludeBackup
+	 	if [ "$excludeBackup" != "" ];then
+			function_validate_file $dirExclude$excludeBackup
+			if [ $? -ne 1 ];then
+				echo "->Archivo de exclusion no existe: "$dirExclude$excludeBackup
+			else
+				excludeBackup="--exclude-from="$dirExclude$excludeBackup
+			fi
+	    fi
+		if [ "$maxSizeFiles" != "" ]; then
+			maxSizeFiles="--max-size="$maxSizeFiles
+		fi
+		if [ "$script" != "" ]; then
+			function_validate_file $dirScript$script
+			if [ $? -ne 1 ];then
+				echo "->Archivo de script no existe: "$dirScript$script
+			else
+				echo "->"execute script $script
+				start=$(date +'%s')
+				exec_script_before_backup $dirScript$script
+				time_elapsed=$(($(date +'%s') - $start))
+				echo "->"$time_elapsed "second "
+			fi
+		fi
+	done
+fi

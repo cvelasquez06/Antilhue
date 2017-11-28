@@ -1,0 +1,14 @@
+#!/bin/bash
+root=$(pwd);
+source $root"/"sys_function.conf
+
+if [ "$1" = "check" ]; then
+	function_validate_dir $2;
+	if [ $? -ne 1 ]; then
+		echo "->ERRO $2"
+		exit 1
+	else
+		echo "->PASS $2"
+		exit 0
+	fi
+fi
