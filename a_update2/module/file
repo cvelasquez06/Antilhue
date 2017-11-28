@@ -3,7 +3,7 @@ root=$(pwd);
 source $root"/"sys_function.conf
 
 if [ "$1" = "check" ]; then
-	function_validate_dir $2;
+	function_validate_file $2;
 	if [ $? -ne 1 ]; then
 		echo "->ERRO_CHECK $2"
 		exit 1

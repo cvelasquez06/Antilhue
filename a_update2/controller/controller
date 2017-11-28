@@ -7,21 +7,21 @@ export $(sed -n '1,/system/d;/\[/,$d;/^$/d;p' $root"/"sys_options.conf)
 #source $root"/"sys_function.conf
 source $root"/"file_manager_test.conf
 
-module/directory check $dirInstall
+$root"/"module/directory check $dirInstall
 if [ $? -eq 1 ]; then 	exit 1; fi
-module/directory check $dirExclude
+$root"/"module/directory check $dirExclude
 if [ $? -eq 1 ]; then 	exit 1; fi
-module/directory check $dirScript
+$root"/"module/directory check $dirScript
 if [ $? -eq 1 ]; then 	exit 1; fi
-module/directory check $dirRootBackup
+$root"/"module/directory check $dirRootBackup
 if [ $? -eq 1 ]; then 	exit 1; fi
-module/directory check $dirBackupCompressed
+$root"/"module/directory check $dirBackupCompressed
 if [ $? -eq 1 ]; then 	exit 1; fi
-module/directory check $dirBackupCompressedUpload
+$root"/"module/directory check $dirBackupCompressedUpload
 if [ $? -eq 1 ]; then 	exit 1; fi
-module/directory check $dirCompressedFinal
+$root"/"module/directory check $dirCompressedFinal
 if [ $? -eq 1 ]; then 	exit 1; fi
-module/directory check $dirCompressedFinalUpload
+$root"/"module/directory check $dirCompressedFinalUpload
 if [ $? -eq 1 ]; then 	exit 1; fi
 
-module/backup local "${backup_list[@]}"
+$root"/"module/backup local $dirScript $dirExclude $dirRootBackup  "${backup_list[@]}" 

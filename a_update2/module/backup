@@ -1,37 +1,69 @@
 #!/bin/bash
 IFS=""
-if [ "$1" = "local" ]; then
+dirDestinationBackup=""
+year=$(date +%Y)
+monthNow=$(date +"%m")
+typeBackup=$1
+directoryScript=$2
+directoryExclude=$3
+directoryDestinationBackup=$4
+
+if [ "$typeBackup" = "local" ]; then
+	shift
+	shift
+	shift
 	shift
 	array=( "$@" )
 	for registers in ${array[*]}; do
 		name=$(echo $registers | awk -F"," '{print $1}' )
-		dirForBackup=$(echo $registers | awk -F"," '{print $2}' )
+		directoryToBackup=$(echo $registers | awk -F"," '{print $2}' )
 		script=$(echo $registers | awk -F"," '{print $3}' )
 		maxSizeFiles=$(echo $registers | awk -F"," '{print $4}' )
 	 	excludeBackup=$(echo $registers | awk -F"," '{print $5}' )
-	 	echo $name","$dirForBackup","$script","$maxSizeFiles","$excludeBackup
+	 	echo ""
+	 	echo "START_FILE "$name
 	 	if [ "$excludeBackup" != "" ];then
-			function_validate_file $dirExclude$excludeBackup
+			module/file check $directoryExclude$excludeBackup
 			if [ $? -ne 1 ];then
-				echo "->Archivo de exclusion no existe: "$dirExclude$excludeBackup
-			else
-				excludeBackup="--exclude-from="$dirExclude$excludeBackup
+				excludeBackup="--exclude-from="$directoryExclude$excludeBackup
 			fi
 	    fi
+
 		if [ "$maxSizeFiles" != "" ]; then
 			maxSizeFiles="--max-size="$maxSizeFiles
 		fi
+
 		if [ "$script" != "" ]; then
-			function_validate_file $dirScript$script
+			module/script check $directoryScript$script
 			if [ $? -ne 1 ];then
-				echo "->Archivo de script no existe: "$dirScript$script
-			else
-				echo "->"execute script $script
+				echo "->execute script "$script
 				start=$(date +'%s')
-				exec_script_before_backup $dirScript$script
+				module/script run $directoryScript$script
 				time_elapsed=$(($(date +'%s') - $start))
-				echo "->"$time_elapsed "second "
+				echo "->"$time_elapsed" second"
 			fi
 		fi
+		
+		dirDestinationBackupAll=$directoryDestinationBackup$year"/"$monthNow
+		module/directory check $dirDestinationBackupAll
+		if [ $? -eq 1 ];then
+			mkdir -p $dirDestinationBackupAll
+		fi
+		module/directory check $dirDestinationBackupAll
+		if [ $? -eq 1 ];then
+			break;
+		fi
+		module/directory check $dirDestinationBackupAll$directoryToBackup
+		if [ $? -eq 1 ];then
+			mkdir -p $dirDestinationBackupAll$directoryToBackup
+		fi
+		module/directory check $dirDestinationBackupAll$directoryToBackup
+		if [ $? -eq 1 ];then
+			break;
+		fi
+
+
+		echo "END_FILE "$name
+		echo ""
 	done
 fi
