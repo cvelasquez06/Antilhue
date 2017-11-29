@@ -15,7 +15,6 @@ if [ "$typeBackup" = "total" ]; then
 fi
 
 if [ "$typeBackup" = "incremental" ]; then
-	echo "rsync -av --progress --stats --force --delete-before --max-size=$maxSizeFiles --prune-empty-dirs $directoryBackup $dirDestinationBackup$directoryBackup --exclude-from=$excludeBackup --compare-dest=$destComparitionBackup$directoryBackup"
 	
-	# rsync -av --progress --stats --force --delete-before --max-size=$maxSizeFiles --prune-empty-dirs $directoryBackup $dirDestinationBackup$directoryBackup --exclude-from=$excludeBackup --compare-dest=$destComparitionBackup$directoryBackup
+	rsync -av --progress --stats --force --delete-before --max-size=$maxSizeFiles --prune-empty-dirs $directoryBackup $dirDestinationBackup$directoryBackup --exclude-from=$excludeBackup --compare-dest=$destComparitionBackup$directoryBackup
 fi

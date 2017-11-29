@@ -28,5 +28,5 @@ if [ $? -eq 1 ]; then 	exit 1; fi
 $root"/"module/directory check $dirCompressedFinalUpload
 if [ $? -eq 1 ]; then 	exit 1; fi
 $root"/"module/backup $role $dirScript $dirExclude $dirRootBackup $backupDirTotal "${backup_list[@]}" 
-# $root"/"module/directory compress $dirRootBackup $dirBackupCompressed
-# if [ $? -eq 1 ]; then 	exit 1; fi
+$root"/"module/directory compress $dirRootBackup $dirBackupCompressed
+if [ $? -eq 1 ]; then 	exit 1; fi

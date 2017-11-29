@@ -34,16 +34,16 @@ array=( "$@" )
 			maxSizeFiles=1000G
 		fi
 
-		#if [ "$script" != "" ]; then
-			# module/script check $directoryScript$script
-			# if [ $? -ne 1 ];then
-			# 	echo "->execute script "$script
-			# 	start=$(date +'%s')
-			# 	module/script run $directoryScript$script
-			# 	time_elapsed=$(($(date +'%s') - $start))
-			# 	echo "->"$time_elapsed" second"
-			# fi
-		#fi
+		if [ "$script" != "" ]; then
+			module/script check $directoryScript$script
+			if [ $? -ne 1 ];then
+				echo "->execute script "$script
+				start=$(date +'%s')
+				module/script run $directoryScript$script
+				time_elapsed=$(($(date +'%s') - $start))
+				echo "->"$time_elapsed" second"
+			fi
+		fi
 		
 		dirDestinationBackupAll=$directoryDestinationBackup
 		module/directory check $dirDestinationBackupAll
