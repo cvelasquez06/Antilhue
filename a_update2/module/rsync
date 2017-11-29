@@ -1,0 +1,14 @@
+#!/bin/bash
+
+typeBackup=$1
+maxSizeFiles=$2
+directory=$3
+dirDestination=$4
+excludeBackup=$5
+
+if [ "$typeBackup" = "total" ]; then
+	start=$(date +'%s')
+	rsync -av --progress --stats --force --delete-before --max-size=$maxSizeFiles $directory $dirDestination$directory --exclude-from=$excludeBackup
+	time_elapsed=$(($(date +'%s') - $start))
+	echo "->"$time_elapsed" second"
+fi

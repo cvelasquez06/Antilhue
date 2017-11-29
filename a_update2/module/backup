@@ -7,13 +7,12 @@ typeBackup=$1
 directoryScript=$2
 directoryExclude=$3
 directoryDestinationBackup=$4
-
+shift
+shift
+shift
+shift
+array=( "$@" )
 if [ "$typeBackup" = "local" ]; then
-	shift
-	shift
-	shift
-	shift
-	array=( "$@" )
 	for registers in ${array[*]}; do
 		name=$(echo $registers | awk -F"," '{print $1}' )
 		directoryToBackup=$(echo $registers | awk -F"," '{print $2}' )
@@ -25,12 +24,12 @@ if [ "$typeBackup" = "local" ]; then
 	 	if [ "$excludeBackup" != "" ];then
 			module/file check $directoryExclude$excludeBackup
 			if [ $? -ne 1 ];then
-				excludeBackup="--exclude-from="$directoryExclude$excludeBackup
+				excludeBackup=$directoryExclude$excludeBackup
 			fi
 	    fi
 
-		if [ "$maxSizeFiles" != "" ]; then
-			maxSizeFiles="--max-size="$maxSizeFiles
+		if [ "$maxSizeFiles" = "" ]; then
+			maxSizeFiles=1000G
 		fi
 
 		if [ "$script" != "" ]; then
@@ -48,20 +47,22 @@ if [ "$typeBackup" = "local" ]; then
 		module/directory check $dirDestinationBackupAll
 		if [ $? -eq 1 ];then
 			mkdir -p $dirDestinationBackupAll
+			module/directory check $dirDestinationBackupAll
+			if [ $? -eq 1 ];then
+				break;
+			fi
 		fi
-		module/directory check $dirDestinationBackupAll
-		if [ $? -eq 1 ];then
-			break;
-		fi
+		
 		module/directory check $dirDestinationBackupAll$directoryToBackup
 		if [ $? -eq 1 ];then
 			mkdir -p $dirDestinationBackupAll$directoryToBackup
-		fi
-		module/directory check $dirDestinationBackupAll$directoryToBackup
-		if [ $? -eq 1 ];then
-			break;
+			module/directory check $dirDestinationBackupAll$directoryToBackup
+			if [ $? -eq 1 ];then
+				break;
+			fi
 		fi
 
+		module/rsync total $maxSizeFiles $directoryToBackup $dirDestinationBackupAll $excludeBackup
 
 		echo "END_FILE "$name
 		echo ""
