@@ -1,10 +1,14 @@
 #!/bin/bash
 root=$(pwd);
 role=$1
+backupDirTotal="/tmp"
 if [ "$role" = "" ]; then echo "->Sin rol definido como parametro"; exit 1; fi
+if [ "$role" = "incremental" ]; then
+export $(sed -n '1,/total/d;/\[/,$d;/^$/d;p' $root"/"sys_options.conf | grep dirRootBackup)
+backupDirTotal=$dirRootBackup
+fi
 export $(sed -n '1,/'$role'/d;/\[/,$d;/^$/d;p' $root"/"sys_options.conf)
 export $(sed -n '1,/system/d;/\[/,$d;/^$/d;p' $root"/"sys_options.conf)
-#source $root"/"sys_function.conf
 source $root"/"file_manager_test.conf
 
 $root"/"module/directory check $dirInstall
@@ -23,5 +27,6 @@ $root"/"module/directory check $dirCompressedFinal
 if [ $? -eq 1 ]; then 	exit 1; fi
 $root"/"module/directory check $dirCompressedFinalUpload
 if [ $? -eq 1 ]; then 	exit 1; fi
-
-$root"/"module/backup local $dirScript $dirExclude $dirRootBackup  "${backup_list[@]}" 
+$root"/"module/backup $role $dirScript $dirExclude $dirRootBackup $backupDirTotal "${backup_list[@]}" 
+# $root"/"module/directory compress $dirRootBackup $dirBackupCompressed
+# if [ $? -eq 1 ]; then 	exit 1; fi

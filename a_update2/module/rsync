@@ -2,13 +2,20 @@
 
 typeBackup=$1
 maxSizeFiles=$2
-directory=$3
-dirDestination=$4
+directoryBackup=$3
+dirDestinationBackup=$4
 excludeBackup=$5
+destComparitionBackup=$6
 
 if [ "$typeBackup" = "total" ]; then
 	start=$(date +'%s')
-	rsync -av --progress --stats --force --delete-before --max-size=$maxSizeFiles $directory $dirDestination$directory --exclude-from=$excludeBackup
+	rsync -av --progress --stats --force --delete-before --max-size=$maxSizeFiles $directoryBackup $dirDestinationBackup$directoryBackup --exclude-from=$excludeBackup
 	time_elapsed=$(($(date +'%s') - $start))
 	echo "->"$time_elapsed" second"
+fi
+
+if [ "$typeBackup" = "incremental" ]; then
+	echo "rsync -av --progress --stats --force --delete-before --max-size=$maxSizeFiles --prune-empty-dirs $directoryBackup $dirDestinationBackup$directoryBackup --exclude-from=$excludeBackup --compare-dest=$destComparitionBackup$directoryBackup"
+	
+	# rsync -av --progress --stats --force --delete-before --max-size=$maxSizeFiles --prune-empty-dirs $directoryBackup $dirDestinationBackup$directoryBackup --exclude-from=$excludeBackup --compare-dest=$destComparitionBackup$directoryBackup
 fi

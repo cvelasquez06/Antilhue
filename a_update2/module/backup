@@ -1,19 +1,19 @@
 #!/bin/bash
 IFS=""
-dirDestinationBackup=""
 year=$(date +%Y)
 monthNow=$(date +"%m")
 typeBackup=$1
 directoryScript=$2
 directoryExclude=$3
 directoryDestinationBackup=$4
+directoryRootTotal=$5
+shift
 shift
 shift
 shift
 shift
 array=( "$@" )
-if [ "$typeBackup" = "local" ]; then
-	for registers in ${array[*]}; do
+	for registers in ${array[@]}; do
 		name=$(echo $registers | awk -F"," '{print $1}' )
 		directoryToBackup=$(echo $registers | awk -F"," '{print $2}' )
 		script=$(echo $registers | awk -F"," '{print $3}' )
@@ -26,24 +26,26 @@ if [ "$typeBackup" = "local" ]; then
 			if [ $? -ne 1 ];then
 				excludeBackup=$directoryExclude$excludeBackup
 			fi
+		else
+			excludeBackup="/tmp"
 	    fi
 
 		if [ "$maxSizeFiles" = "" ]; then
 			maxSizeFiles=1000G
 		fi
 
-		if [ "$script" != "" ]; then
-			module/script check $directoryScript$script
-			if [ $? -ne 1 ];then
-				echo "->execute script "$script
-				start=$(date +'%s')
-				module/script run $directoryScript$script
-				time_elapsed=$(($(date +'%s') - $start))
-				echo "->"$time_elapsed" second"
-			fi
-		fi
+		#if [ "$script" != "" ]; then
+			# module/script check $directoryScript$script
+			# if [ $? -ne 1 ];then
+			# 	echo "->execute script "$script
+			# 	start=$(date +'%s')
+			# 	module/script run $directoryScript$script
+			# 	time_elapsed=$(($(date +'%s') - $start))
+			# 	echo "->"$time_elapsed" second"
+			# fi
+		#fi
 		
-		dirDestinationBackupAll=$directoryDestinationBackup$year"/"$monthNow
+		dirDestinationBackupAll=$directoryDestinationBackup
 		module/directory check $dirDestinationBackupAll
 		if [ $? -eq 1 ];then
 			mkdir -p $dirDestinationBackupAll
@@ -62,9 +64,8 @@ if [ "$typeBackup" = "local" ]; then
 			fi
 		fi
 
-		module/rsync total $maxSizeFiles $directoryToBackup $dirDestinationBackupAll $excludeBackup
+		module/rsync $typeBackup $maxSizeFiles $directoryToBackup $dirDestinationBackupAll $excludeBackup $directoryRootTotal
 
 		echo "END_FILE "$name
 		echo ""
 	done
-fi

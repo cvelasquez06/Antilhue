@@ -1,5 +1,8 @@
 #!/bin/bash
 root=$(pwd);
+year=$(date +%Y)
+monthNow=$(date +"%m")
+
 source $root"/"sys_function.conf
 
 if [ "$1" = "check" ]; then
@@ -10,5 +13,27 @@ if [ "$1" = "check" ]; then
 	else
 		echo "->PASS_CHECK $2"
 		exit 0
+	fi
+fi
+
+if [ "$1" = "compress" ]; then
+	origin=$2
+	destination=$3
+	function_validate_dir $origin;
+	if [ $? -ne 1 ]; then
+		echo "->ERRO_CHECK $origin"
+		exit 1
+	else
+		echo "->PASS_CHECK $origin"
+		function_validate_dir $destination;
+		if [ $? -ne 1 ]; then
+			echo "->ERRO_CHECK $destination"
+			exit 1
+		else
+			echo "->PASS_CHECK $destination"
+			tar -czf $destination$year$monthNow".tar.gz" $origin*
+			exit 0
+		fi
+	exit 0
 	fi
 fi
