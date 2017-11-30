@@ -41,7 +41,7 @@ array=( "$@" )
 			if [ $? -ne 1 ];then
 				module/logs write "execute script $script" $dirLogs $role
 				start=$(date +'%s')
-				module/script run $directoryScript$script
+				module/script run $directoryScript$script $dirLogs $role
 				time_elapsed=$(($(date +'%s') - $start))
 				module/logs write "$time_elapsed second" $dirLogs $role
 			fi
@@ -62,8 +62,9 @@ array=( "$@" )
 			if [ $? -eq 1 ];then break; fi
 		fi
 
-		#module/rsync $role $maxSizeFiles $directoryToBackup $dirDestinationBackupAll $excludeBackup $directoryRootTotal $dirLogs
-
+		module/rsync $role $maxSizeFiles $directoryToBackup $dirDestinationBackupAll $excludeBackup $directoryRootTotal $dirLogs
+		module/directory size $directoryToBackup $dirLogs $role
+		module/directory size $dirDestinationBackupAll$directoryToBackup $dirLogs $role
 		module/logs write "END_FILE $name" $dirLogs $role
 		module/logs write "" $dirLogs $role
 	done

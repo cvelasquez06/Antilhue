@@ -1,10 +1,18 @@
 #!/bin/bash
 
-nameLogs=$(date +%d%m%Y_%H)
-dateTime=$(date +%d%m%Y_%H%M%S)
+dateTime=$(date +%Y/%m/%d" "%H:%M:%S)
+content=$2
 dirLogs=$3
 role=$4
+nameLogs=$role"_"$(date +%d%m%Y)".log"
+
 if [ "$1" = "write" ]; then
-	echo $dateTime";"$2 >> $dirLogs$role"_"$nameLogs".log"
-	echo $2
+	echo $dateTime" [$content]" >> $dirLogs$nameLogs
+	echo $content
+	exit 0
+fi
+
+if [ "$1" = "getname" ]; then
+	echo $dirLogs$nameLogs;
+	exit 0
 fi
