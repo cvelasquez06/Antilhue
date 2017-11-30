@@ -6,31 +6,49 @@ monthNow=$(date +"%m")
 source $root"/"sys_function.conf
 
 if [ "$1" = "check" ]; then
+	dirLogs=$3
+	role=$4
 	function_validate_dir $2;
 	if [ $? -ne 1 ]; then
-		echo "->ERRO_CHECK $2"
+		module/logs write "ERRO_CHECK $2" $dirLogs $role
 		exit 1
 	else
-		echo "->PASS_CHECK $2"
+		module/logs write "PASS_CHECK $2" $dirLogs $role
 		exit 0
 	fi
 fi
 
+if [ "$1" = "create" ]; then
+	dirLogs=$3
+	role=$4
+	function_create_dir $2;
+	if [ $? -ne 1 ]; then
+		module/logs write "ERRO_CHECK $2" $dirLogs $role
+		exit 1
+	else
+		module/logs write "PASS_CHECK $2" $dirLogs $role
+		exit 0
+	fi
+fi
+
+
 if [ "$1" = "compress" ]; then
 	origin=$2
 	destination=$3
+	dirLogs=$4
+	role=$5
 	function_validate_dir $origin;
 	if [ $? -ne 1 ]; then
-		echo "->ERRO_CHECK $origin"
+		module/logs write "ERRO_CHECK $origin" $dirLogs $role
 		exit 1
 	else
-		echo "->PASS_CHECK $origin"
+		module/logs write "PASS_CHECK $origin" $dirLogs $role
 		function_validate_dir $destination;
 		if [ $? -ne 1 ]; then
-			echo "->ERRO_CHECK $destination"
+			module/logs write "ERRO_CHECK $destination" $dirLogs $role
 			exit 1
 		else
-			echo "->PASS_CHECK $destination"
+			module/logs write "PASS_CHECK $destination" $dirLogs $role
 			tar -czf $destination$year$monthNow".tar.gz" $origin*
 			exit 0
 		fi

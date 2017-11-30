@@ -2,11 +2,13 @@
 IFS=""
 year=$(date +%Y)
 monthNow=$(date +"%m")
-typeBackup=$1
+role=$1
 directoryScript=$2
 directoryExclude=$3
 directoryDestinationBackup=$4
 directoryRootTotal=$5
+dirLogs=$6
+shift
 shift
 shift
 shift
@@ -19,10 +21,12 @@ array=( "$@" )
 		script=$(echo $registers | awk -F"," '{print $3}' )
 		maxSizeFiles=$(echo $registers | awk -F"," '{print $4}' )
 	 	excludeBackup=$(echo $registers | awk -F"," '{print $5}' )
-	 	echo ""
-	 	echo "START_FILE "$name
+
+	 	module/logs write "" $dirLogs $role
+	 	module/logs write "START_FILE $name" $dirLogs $role
+	 	
 	 	if [ "$excludeBackup" != "" ];then
-			module/file check $directoryExclude$excludeBackup
+			module/file check $directoryExclude$excludeBackup $dirLogs $role
 			if [ $? -ne 1 ];then
 				excludeBackup=$directoryExclude$excludeBackup
 			fi
@@ -30,42 +34,36 @@ array=( "$@" )
 			excludeBackup="/tmp"
 	    fi
 
-		if [ "$maxSizeFiles" = "" ]; then
-			maxSizeFiles=1000G
-		fi
+		if [ "$maxSizeFiles" = "" ]; then maxSizeFiles=1000G; fi
 
 		if [ "$script" != "" ]; then
-			module/script check $directoryScript$script
+			module/script check $directoryScript$script $dirLogs $role
 			if [ $? -ne 1 ];then
-				echo "->execute script "$script
+				module/logs write "execute script $script" $dirLogs $role
 				start=$(date +'%s')
 				module/script run $directoryScript$script
 				time_elapsed=$(($(date +'%s') - $start))
-				echo "->"$time_elapsed" second"
+				module/logs write "$time_elapsed second" $dirLogs $role
 			fi
 		fi
 		
 		dirDestinationBackupAll=$directoryDestinationBackup
-		module/directory check $dirDestinationBackupAll
+		module/directory check $dirDestinationBackupAll $dirLogs $role
 		if [ $? -eq 1 ];then
-			mkdir -p $dirDestinationBackupAll
-			module/directory check $dirDestinationBackupAll
-			if [ $? -eq 1 ];then
-				break;
-			fi
+			module/directory create $dirDestinationBackupAll
+			module/directory check $dirDestinationBackupAll $dirLogs $role
+			if [ $? -eq 1 ];then break;	fi
 		fi
 		
-		module/directory check $dirDestinationBackupAll$directoryToBackup
+		module/directory check $dirDestinationBackupAll$directoryToBackup $dirLogs $role
 		if [ $? -eq 1 ];then
-			mkdir -p $dirDestinationBackupAll$directoryToBackup
-			module/directory check $dirDestinationBackupAll$directoryToBackup
-			if [ $? -eq 1 ];then
-				break;
-			fi
+			module/directory create $dirDestinationBackupAll$directoryToBackup $dirLogs $role
+			module/directory check $dirDestinationBackupAll$directoryToBackup $dirLogs $role
+			if [ $? -eq 1 ];then break; fi
 		fi
 
-		module/rsync $typeBackup $maxSizeFiles $directoryToBackup $dirDestinationBackupAll $excludeBackup $directoryRootTotal
+		#module/rsync $role $maxSizeFiles $directoryToBackup $dirDestinationBackupAll $excludeBackup $directoryRootTotal $dirLogs
 
-		echo "END_FILE "$name
-		echo ""
+		module/logs write "END_FILE $name" $dirLogs $role
+		module/logs write "" $dirLogs $role
 	done

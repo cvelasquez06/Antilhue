@@ -1,20 +1,23 @@
 #!/bin/bash
 
-typeBackup=$1
+role=$1
 maxSizeFiles=$2
 directoryBackup=$3
 dirDestinationBackup=$4
 excludeBackup=$5
 destComparitionBackup=$6
+dirLogs=$7
 
-if [ "$typeBackup" = "total" ]; then
+if [ "$role" = "total" ]; then
 	start=$(date +'%s')
 	rsync -av --progress --stats --force --delete-before --max-size=$maxSizeFiles $directoryBackup $dirDestinationBackup$directoryBackup --exclude-from=$excludeBackup
 	time_elapsed=$(($(date +'%s') - $start))
-	echo "->"$time_elapsed" second"
+	module/logs write $time_elapsed" second" $dirLogs $role
 fi
 
-if [ "$typeBackup" = "incremental" ]; then
-	
+if [ "$role" = "incremental" ]; then
+	start=$(date +'%s')
 	rsync -av --progress --stats --force --delete-before --max-size=$maxSizeFiles --prune-empty-dirs $directoryBackup $dirDestinationBackup$directoryBackup --exclude-from=$excludeBackup --compare-dest=$destComparitionBackup$directoryBackup
+	time_elapsed=$(($(date +'%s') - $start))
+	module/logs write $time_elapsed" second" $dirLogs $role
 fi
