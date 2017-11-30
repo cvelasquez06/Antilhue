@@ -1,16 +1,16 @@
 #!/bin/bash
 root=$(pwd)
 source $root"/"sys_function.conf
-
+IFS=""
 if [ "$1" = "check" ]; then
 	dirLogs=$3
 	role=$4
 	function_validate_file $2;
 	if [ $? -ne 1 ]; then
-		module/logs write "ERRO_CHECK $2" $dirLogs $role
+		module/logs write "SCRPT_ERRO $2" $dirLogs $role
 		exit 1
 	else
-		module/logs write "PASS_CHECK $2" $dirLogs $role
+		module/logs write "SCRPT_PASS $2" $dirLogs $role
 		exit 0
 	fi
 fi
@@ -20,10 +20,10 @@ if [ "$1" = "run" ]; then
 	role=$4
 	exec_script_before_backup $2;
 	if [ $? -ne 1 ]; then
-		module/logs write "ERRO_CHECK $2" $dirLogs $role
+		module/logs write "SCRPT_ERRO $2" $dirLogs $role
 		exit 1
 	else
-		module/logs write "PASS_CHECK $2" $dirLogs $role
+		module/logs write "SCRPT_PASS $2" $dirLogs $role
 		exit 0
 	fi
 fi

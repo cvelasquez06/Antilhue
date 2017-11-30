@@ -5,7 +5,7 @@ content=$2
 dirLogs=$3
 role=$4
 nameLogs=$role"_"$(date +%d%m%Y)".log"
-
+IFS=""
 if [ "$1" = "write" ]; then
 	echo $dateTime" [$content]" >> $dirLogs$nameLogs
 	echo $content

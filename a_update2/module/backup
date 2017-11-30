@@ -1,5 +1,4 @@
 #!/bin/bash
-IFS=""
 year=$(date +%Y)
 monthNow=$(date +"%m")
 role=$1
@@ -15,6 +14,7 @@ shift
 shift
 shift
 array=( "$@" )
+IFS=""
 	for registers in ${array[@]}; do
 		name=$(echo $registers | awk -F"," '{print $1}' )
 		directoryToBackup=$(echo $registers | awk -F"," '{print $2}' )
@@ -62,9 +62,10 @@ array=( "$@" )
 			if [ $? -eq 1 ];then break; fi
 		fi
 
-		module/rsync $role $maxSizeFiles $directoryToBackup $dirDestinationBackupAll $excludeBackup $directoryRootTotal $dirLogs
-		module/directory size $directoryToBackup $dirLogs $role
-		module/directory size $dirDestinationBackupAll$directoryToBackup $dirLogs $role
+		module/rsync $role $maxSizeFiles "$directoryToBackup" $dirDestinationBackupAll $excludeBackup $directoryRootTotal $dirLogs
+		
+		module/directory size "$directoryToBackup" $dirLogs $role
+		module/directory size "$dirDestinationBackupAll$directoryToBackup" $dirLogs $role
 		module/logs write "END_FILE $name" $dirLogs $role
 		module/logs write "" $dirLogs $role
 	done

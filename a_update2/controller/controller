@@ -11,7 +11,8 @@ fi
 export $(sed -n '1,/'$role'/d;/\[/,$d;/^$/d;p' $root"/"sys_options.conf)
 export $(sed -n '1,/system/d;/\[/,$d;/^$/d;p' $root"/"sys_options.conf)
 
-source $root"/"file_manager_test.conf
+source $root"/"file_manager.conf
+
 module/directory check $dirLogs $dirLogs $role
 if [ $? -eq 1 ]; then 	exit 1; fi
 module/directory check $dirInstall $dirLogs $role
@@ -33,5 +34,5 @@ if [ $? -eq 1 ]; then 	exit 1; fi
 
 module/backup $role $dirScript $dirExclude $dirRootBackup $backupDirTotal $dirLogs "${backup_list[@]}"
 
-#module/directory compress $dirRootBackup $dirBackupCompressed $dirLogs $role
-#if [ $? -eq 1 ]; then 	exit 1; fi
+module/directory compress $dirRootBackup $dirBackupCompressed $dirLogs $role
+if [ $? -eq 1 ]; then 	exit 1; fi

@@ -2,7 +2,7 @@
 root=$(pwd);
 year=$(date +%Y)
 monthNow=$(date +"%m")
-
+IFS=""
 source $root"/"sys_function.conf
 
 if [ "$1" = "check" ]; then
@@ -10,10 +10,10 @@ if [ "$1" = "check" ]; then
 	role=$4
 	function_validate_dir $2;
 	if [ $? -ne 1 ]; then
-		module/logs write "ERRO_CHECK $2" $dirLogs $role
+		module/logs write "DIR_ERRO $2" $dirLogs $role
 		exit 1
 	else
-		module/logs write "PASS_CHECK $2" $dirLogs $role
+		module/logs write "DIR_PASS $2" $dirLogs $role
 		exit 0
 	fi
 fi
@@ -23,10 +23,10 @@ if [ "$1" = "create" ]; then
 	role=$4
 	function_create_dir $2;
 	if [ $? -ne 1 ]; then
-		module/logs write "ERRO_CHECK $2" $dirLogs $role
+		module/logs write "DIR_ERRO $2" $dirLogs $role
 		exit 1
 	else
-		module/logs write "PASS_CHECK $2" $dirLogs $role
+		module/logs write "DIR_PASS $2" $dirLogs $role
 		exit 0
 	fi
 fi
@@ -39,16 +39,16 @@ if [ "$1" = "compress" ]; then
 	role=$5
 	function_validate_dir $origin;
 	if [ $? -ne 1 ]; then
-		module/logs write "ERRO_CHECK $origin" $dirLogs $role
+		module/logs write "DIR_ERRO $origin" $dirLogs $role
 		exit 1
 	else
-		module/logs write "PASS_CHECK $origin" $dirLogs $role
+		module/logs write "DIR_PASS $origin" $dirLogs $role
 		function_validate_dir $destination;
 		if [ $? -ne 1 ]; then
-			module/logs write "ERRO_CHECK $destination" $dirLogs $role
+			module/logs write "DIR_ERRO $destination" $dirLogs $role
 			exit 1
 		else
-			module/logs write "PASS_CHECK $destination" $dirLogs $role
+			module/logs write "DIR_PASS $destination" $dirLogs $role
 			tar -czf $destination$year$monthNow".tar.gz" $origin*
 			exit 0
 		fi
@@ -59,6 +59,6 @@ fi
 if [ "$1" = "size" ]; then
 	dirLogs=$3
 	role=$4
-	size=$(function_getsize_dir $2)
-	module/logs write "$size $2" $dirLogs $role
+	size=$(function_getsize_dir "$2")
+	module/logs write "FILE_SIZE $size $2" $dirLogs $role
 fi
