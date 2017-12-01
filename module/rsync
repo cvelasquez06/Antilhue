@@ -1,0 +1,24 @@
+#!/bin/bash
+
+role=$1
+maxSizeFiles=$2
+directoryBackup=$3
+dirDestinationBackup=$4
+excludeBackup=$5
+destComparitionBackup=$6
+dirLogs=$7
+IFS=""
+nameLog=$(module/logs getname "-" $dirLogs $role)
+if [ "$role" = "total" ]; then
+	start=$(date +'%s')
+	rsync -av --progress --stats --force --delete-before --max-size=$maxSizeFiles "$directoryBackup" $dirDestinationBackup$directoryBackup --exclude-from=$excludeBackup --log-file=$nameLog
+	time_elapsed=$(($(date +'%s') - $start))
+	module/logs write "rsync $time_elapsed second" $dirLogs $role
+fi
+
+if [ "$role" = "incremental" ]; then
+	start=$(date +'%s')
+	rsync -av --progress --stats --force --delete-before --max-size=$maxSizeFiles --prune-empty-dirs $directoryBackup $dirDestinationBackup$directoryBackup --exclude-from=$excludeBackup --compare-dest=$destComparitionBackup$directoryBackup --log-file=$nameLog
+	time_elapsed=$(($(date +'%s') - $start))
+	module/logs write "rsync $time_elapsed second" $dirLogs $role
+fi

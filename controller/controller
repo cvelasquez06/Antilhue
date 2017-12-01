@@ -1,0 +1,38 @@
+#!/bin/bash
+root=$(pwd);
+role=$1
+backupDirTotal="/tmp"
+if [ "$role" = "" ]; then echo "->Sin rol definido como parametro"; exit 1; fi
+if [ "$role" = "incremental" ]; then
+	export $(sed -n '1,/total/d;/\[/,$d;/^$/d;p' $root"/"sys_options.conf | grep dirRootBackup)
+	backupDirTotal=$dirRootBackup
+fi
+
+export $(sed -n '1,/'$role'/d;/\[/,$d;/^$/d;p' $root"/"sys_options.conf)
+export $(sed -n '1,/system/d;/\[/,$d;/^$/d;p' $root"/"sys_options.conf)
+
+source $root"/"file_manager.conf
+
+module/directory check $dirLogs $dirLogs $role
+if [ $? -eq 1 ]; then 	exit 1; fi
+module/directory check $dirInstall $dirLogs $role
+if [ $? -eq 1 ]; then 	exit 1; fi
+module/directory check $dirExclude $dirLogs $role
+if [ $? -eq 1 ]; then 	exit 1; fi
+module/directory check $dirScript $dirLogs $role
+if [ $? -eq 1 ]; then 	exit 1; fi
+module/directory check $dirRootBackup $dirLogs $role
+if [ $? -eq 1 ]; then 	exit 1; fi
+module/directory check $dirBackupCompressed $dirLogs $role
+if [ $? -eq 1 ]; then 	exit 1; fi
+module/directory check $dirBackupCompressedUpload $dirLogs $role
+if [ $? -eq 1 ]; then 	exit 1; fi
+module/directory check $dirCompressedFinal $dirLogs $role
+if [ $? -eq 1 ]; then 	exit 1; fi
+module/directory check $dirCompressedFinalUpload $dirLogs $role
+if [ $? -eq 1 ]; then 	exit 1; fi
+
+module/backup $role $dirScript $dirExclude $dirRootBackup $backupDirTotal $dirLogs "${backup_list[@]}"
+
+module/directory compress $dirRootBackup $dirBackupCompressed $dirLogs $role
+if [ $? -eq 1 ]; then 	exit 1; fi

@@ -1,0 +1,64 @@
+#!/bin/bash
+root=$(pwd);
+year=$(date +%Y)
+monthNow=$(date +"%m")
+IFS=""
+source $root"/"sys_function.conf
+
+if [ "$1" = "check" ]; then
+	dirLogs=$3
+	role=$4
+	function_validate_dir $2;
+	if [ $? -ne 1 ]; then
+		module/logs write "DIR_ERRO $2" $dirLogs $role
+		exit 1
+	else
+		module/logs write "DIR_PASS $2" $dirLogs $role
+		exit 0
+	fi
+fi
+
+if [ "$1" = "create" ]; then
+	dirLogs=$3
+	role=$4
+	function_create_dir $2;
+	if [ $? -ne 1 ]; then
+		module/logs write "DIR_ERRO $2" $dirLogs $role
+		exit 1
+	else
+		module/logs write "DIR_PASS $2" $dirLogs $role
+		exit 0
+	fi
+fi
+
+
+if [ "$1" = "compress" ]; then
+	origin=$2
+	destination=$3
+	dirLogs=$4
+	role=$5
+	function_validate_dir $origin;
+	if [ $? -ne 1 ]; then
+		module/logs write "DIR_ERRO $origin" $dirLogs $role
+		exit 1
+	else
+		module/logs write "DIR_PASS $origin" $dirLogs $role
+		function_validate_dir $destination;
+		if [ $? -ne 1 ]; then
+			module/logs write "DIR_ERRO $destination" $dirLogs $role
+			exit 1
+		else
+			module/logs write "DIR_PASS $destination" $dirLogs $role
+			tar -czf $destination$year$monthNow".tar.gz" $origin*
+			exit 0
+		fi
+	exit 0
+	fi
+fi
+
+if [ "$1" = "size" ]; then
+	dirLogs=$3
+	role=$4
+	size=$(function_getsize_dir "$2")
+	module/logs write "FILE_SIZE $size $2" $dirLogs $role
+fi

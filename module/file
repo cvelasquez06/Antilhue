@@ -1,0 +1,17 @@
+#!/bin/bash
+root=$(pwd);
+source $root"/"sys_function.conf
+
+IFS=""
+if [ "$1" = "check" ]; then
+	dirLogs=$3
+	role=$4
+	function_validate_file $2;
+	if [ $? -ne 1 ]; then
+		module/logs write "FILE_ERRO $2" $dirLogs $role
+		exit 1
+	else
+		module/logs write "FILE_PASS $2" $dirLogs $role
+		exit 0
+	fi
+fi
