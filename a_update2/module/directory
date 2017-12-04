@@ -37,6 +37,7 @@ if [ "$1" = "compress" ]; then
 	destination=$3
 	dirLogs=$4
 	role=$5
+	module/logs write "DIR_ZIP $origin" $dirLogs $role
 	function_validate_dir $origin;
 	if [ $? -ne 1 ]; then
 		module/logs write "DIR_ERRO $origin" $dirLogs $role
