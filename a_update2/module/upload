@@ -1,0 +1,15 @@
+#!/bin/bash
+
+root=$(pwd);
+upType=$1
+toUpload=$2
+toDestination=$3
+dirLogs=$4
+role=$5
+
+if [ "$upType" = "s3" ]; then
+	module/logs write "UPLOAD_S3 from $toUpload" $dirLogs $role
+	module/directory size "$toUpload" $dirLogs $role
+	s3cmd $toUpload $toDestination 
+fi
+
