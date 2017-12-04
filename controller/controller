@@ -38,6 +38,6 @@ module/directory compress $dirRootBackup $dirBackupCompressed $dirLogs $role
 if [ $? -eq 1 ]; then 	exit 1; fi
 
 fileNameCompress=$(module/directory "getNameCompress")
-module/upload "s3" 
+module/upload "s3" $dirBackupCompressed$fileNameCompress $s3ToUpload $dirLogs $role
 if [ $? -eq 1 ]; then 	exit 1; fi
 
