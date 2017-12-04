@@ -62,3 +62,7 @@ if [ "$1" = "size" ]; then
 	size=$(function_getsize_dir "$2")
 	module/logs write "FILE_SIZE $size $2" $dirLogs $role
 fi
+
+if [ "$1" = "getNameCompress" ]; then
+	echo $year$monthNow".tar.gz"
+fi
