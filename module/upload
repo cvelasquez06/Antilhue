@@ -10,6 +10,7 @@ role=$5
 if [ "$upType" = "s3" ]; then
 	module/logs write "UPLOAD_S3 from $toUpload" $dirLogs $role
 	module/directory size "$toUpload" $dirLogs $role
-	s3cmd $toUpload $toDestination 
+	nameLog=$(module/logs getname "-" $dirLogs $role)
+	s3cmd put $toUpload $toDestination >> $nameLog
 fi
 
